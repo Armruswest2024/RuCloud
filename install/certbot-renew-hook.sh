@@ -8,12 +8,12 @@ set -euo pipefail
 
 # Определяем путь к проекту
 PROJECT_DIR=""
-if [[ -f "/etc/myfakesite/project_path" ]]; then
-  PROJECT_DIR=$(cat /etc/myfakesite/project_path)
+if [[ -f "/etc/rucloud/project_path" ]]; then
+  PROJECT_DIR=$(cat /etc/rucloud/project_path)
 elif [[ -n "${PROJECT_DIR:-}" ]]; then
   : # уже задан из cron env
-elif [[ -f "/opt/myfakesite/docker-compose.yml" ]]; then
-  PROJECT_DIR="/opt/myfakesite"
+elif [[ -f "/opt/rucloud/docker-compose.yml" ]]; then
+  PROJECT_DIR="/opt/rucloud"
 fi
 
 if [[ -z "$PROJECT_DIR" || ! -f "$PROJECT_DIR/docker-compose.yml" ]]; then

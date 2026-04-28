@@ -1,7 +1,7 @@
 # file: docker-compose.yml v1.0
 #
-# Docker Compose configuration for MySphere Mock API portal.
-# Конфигурация Docker Compose для портала MySphere (имитация API).
+# Docker Compose configuration for RuCloud Mock API portal.
+# Конфигурация Docker Compose для портала RuCloud (имитация API).
 #
 # Services: nginx (web server) + php-fpm (PHP processor)
 # Сервисы: nginx (веб-сервер) + php-fpm (обработка PHP)
@@ -31,7 +31,7 @@ services:
       - ./data/status.php:/usr/share/nginx/html/status.php:ro
       - ./data/VERSION:/usr/share/nginx/html/VERSION:ro
       # Dedicated auth attempts log storage on host
-      - /var/log/myfakesite:/var/log/myfakesite
+      - /var/log/rucloud:/var/log/rucloud
       # Let's Encrypt ACME challenge (for certbot webroot validation)
       # Челлендж Let's Encrypt (для валидации certbot через webroot)
       - /var/www/acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge

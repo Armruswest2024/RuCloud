@@ -212,7 +212,7 @@ if [[ "$SSL_MODE" != "letsencrypt" ]]; then
   if [[ -f "$SSL_CERT_PATH" && -f "$SSL_KEY_PATH" ]]; then
     existing_issuer=""
     existing_issuer=$(openssl x509 -in "$SSL_CERT_PATH" -noout -issuer 2>/dev/null || true)
-    if [[ -n "$existing_issuer" ]] && ! echo "$existing_issuer" | grep -qi "MySphere\|fake"; then
+    if [[ -n "$existing_issuer" ]] && ! echo "$existing_issuer" | grep -qi "RuCloud\\|fake"; then
       warn "В $SSL_DIR уже есть сертификат: $existing_issuer"
       warn "Используем его вместо генерации нового"
       if echo "$existing_issuer" | grep -qi "Let's Encrypt"; then

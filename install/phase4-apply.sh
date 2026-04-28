@@ -78,13 +78,13 @@ server {
 
     location ~ ^/api/status$ {
         default_type application/json;
-        add_header X-Powered-By "MySphere/VERSION_PLACEHOLDER" always;
+        add_header X-Powered-By "RuCloud/VERSION_PLACEHOLDER" always;
         add_header X-Request-Id "$request_id" always;
         add_header X-Content-Type-Options "nosniff" always;
         add_header X-Frame-Options "SAMEORIGIN" always;
         add_header X-Robots-Tag "noindex, nofollow" always;
         add_header Referrer-Policy "no-referrer" always;
-        return 200 '{"online":true,"maintenance":false,"version":"VERSION_PLACEHOLDER","build":"2026.03.15","product":"MySphere","api":"1.0"}';
+        return 200 '{"online":true,"maintenance":false,"version":"VERSION_PLACEHOLDER","build":"2026.03.15","product":"RuCloud","api":"1.0"}';
     }
 
     error_page 429 = @rate_limited;
@@ -98,7 +98,7 @@ server {
 
     location ~ ^/api/auth$ {
         limit_req zone=auth_limit burst=2 nodelay;
-        access_log /var/log/myfakesite/access.log combined;
+        access_log /var/log/rucloud/access.log combined;
 
         default_type application/json;
         add_header X-Request-Id "$request_id" always;
