@@ -21,13 +21,13 @@ if [[ -z "$PROJECT_DIR" || ! -f "$PROJECT_DIR/docker-compose.yml" ]]; then
   exit 0
 fi
 
-echo "[certbot-renew-hook] Перезапуск контейнера fakesite ($PROJECT_DIR)..." >&2
+echo "[certbot-renew-hook] Перезапуск контейнера rucloud ($PROJECT_DIR)..." >&2
 cd "$PROJECT_DIR"
 
 if docker compose version >/dev/null 2>&1; then
-  docker compose restart fakesite
+  docker compose restart rucloud
 else
-  docker-compose restart fakesite
+  docker-compose restart rucloud
 fi
 
 echo "[certbot-renew-hook] Контейнер перезапущен ✓" >&2

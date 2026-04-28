@@ -74,12 +74,12 @@ if [[ "${SSL_MODE:-}" == "letsencrypt" ]]; then
     # certbot пишет challenge в /var/www/acme-challenge
     # nginx в контейнере монтирует этот путь и отдаёт challenge
     # deploy-hook вызывается ТОЛЬКО при реальном обновлении cert
-    cat > /etc/cron.d/certbot-fakesite <<CRON
-# RuCloud fakesite — certbot auto-renewal (webroot, zero-downtime)
+    cat > /etc/cron.d/certbot-rucloud <<CRON
+# RuCloud — certbot auto-renewal (webroot, zero-downtime)
 # certbot renew проверяет сертификаты ежедневно, обновляет если <30 дней до истечения
-0 3 * * * root certbot renew --quiet --deploy-hook "${HOOK_SCRIPT}" > /var/log/certbot-fakesite.log 2>&1
+0 3 * * * root certbot renew --quiet --deploy-hook "${HOOK_SCRIPT}" > /var/log/certbot-rucloud.log 2>&1
 CRON
-    chmod 644 /etc/cron.d/certbot-fakesite
+    chmod 644 /etc/cron.d/certbot-rucloud
 
     log "cron job создан: ежедневная проверка в 3:00 (webroot, без даунтайма) ✓"
   else
@@ -97,7 +97,7 @@ LOG_ROTATE_SCRIPT="${PROJECT_DIR}/data/log-rotate-by-size.sh"
 if [[ -f "$LOG_ROTATE_SCRIPT" ]]; then
   chmod 755 "$LOG_ROTATE_SCRIPT" 2>/dev/null || true
   cat > /etc/cron.d/rucloud-log-rotate <<CRON
-# RuCloud fakesite — access log rotation by size (1 MiB), without logrotate
+# RuCloud — access log rotation by size (1 MiB), without logrotate
 */5 * * * * root ${LOG_ROTATE_SCRIPT} >/dev/null 2>&1
 CRON
   chmod 644 /etc/cron.d/rucloud-log-rotate
@@ -111,7 +111,7 @@ fi
 #################################
 echo ""
 echo "==================================================="
-echo "  ✔ RuCloud fakesite установлен и запущен!"
+echo "  ✔ RuCloud установлен и запущен!"
 echo "==================================================="
 echo ""
 
