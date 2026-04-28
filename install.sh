@@ -331,9 +331,10 @@ source "$PHASE_DIR/phase4-apply.sh"
 # shellcheck source=/dev/null
 source "$PHASE_DIR/phase5-start.sh"
 
-# ─── Post-install: Force replace any remaining MySphere references ───
-log "Выполняем финальную проверку и замену MySphere → RuCloud..."
+# ─── Post-install: Force replace any remaining MySphere/RuCloud references ───
+log "Выполняем финальную проверку и замену брендинга..."
 find "$PROJECT_DIR/data" -type f \( -name "*.html" -o -name "*.php" -o -name "*.conf" -o -name "*.json" \) -exec sed -i 's/MySphere/RuCloud/g' {} \; 2>/dev/null || true
+find "$PROJECT_DIR" -maxdepth 1 -type f -name "*.sh" -exec sed -i 's/myfakesite/rucloud/g' {} \; 2>/dev/null || true
 log "Финальная замена завершена ✓"
 
 # ─── Self-delete install script ──────────────────────────────

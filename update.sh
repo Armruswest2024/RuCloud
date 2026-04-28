@@ -16,22 +16,22 @@ usage() {
   update.sh [-r <repo_url>] [-b <branch>] [-p <project_dir>] [-y]
 
 Параметры:
-  -r  Git URL репозитория (по умолчанию: https://github.com/iqubik/myfakesite.git)
+  -r  Git URL репозитория (по умолчанию: https://github.com/Armruswest2024/RuCloud)
   -b  Ветка (по умолчанию: main)
-  -p  Папка проекта (по умолчанию: /opt/myfakesite)
+  -p  Папка проекта (по умолчанию: /opt/rucloud)
   -y  Неинтерактивный режим (без подтверждения)
   -h  Показать справку
 
 Примеры:
   ./update.sh                              # Обновить до main
   ./update.sh -b feature-branch            # Обновить до ветки
-  ./update.sh -r https://github.com/me/myfakesite.git -b mybranch
+  ./update.sh -r https://github.com/Armruswest2024/RuCloud -b mybranch
 EOF
 }
 
-REPO_URL="https://github.com/iqubik/myfakesite.git"
+REPO_URL="https://github.com/Armruswest2024/RuCloud"
 BRANCH="main"
-PROJECT_DIR="/opt/myfakesite"
+PROJECT_DIR="/opt/rucloud"
 NON_INTERACTIVE=false
 
 while getopts ":r:b:p:yh" opt; do
@@ -92,7 +92,7 @@ check_containers_running() {
 
 # ─── START ─────────────────────────────────────────────────
 echo "==================================================="
-echo "  MySphere — Обновление"
+echo "  RuCloud — Обновление"
 echo "==================================================="
 echo ""
 echo "[INFO] Версия скрипта: $VERSION"
@@ -285,11 +285,11 @@ if [[ "$MODE" == "https" && -f "$LE_CERT" && "$HAS_CERTBOT" -eq 1 ]]; then
   log "Проверяем авто-обновление сертификатов..."
   if [[ ! -f /etc/cron.d/certbot-fakesite ]]; then
     log "Настраиваем авто-обновление сертификатов..."
-    mkdir -p /etc/myfakesite
-    echo "$PROJECT_DIR" > /etc/myfakesite/project_path
+    mkdir -p /etc/rucloud
+    echo "$PROJECT_DIR" > /etc/rucloud/project_path
     HOOK_SCRIPT="${PROJECT_DIR}/install/certbot-renew-hook.sh"
     cat > /etc/cron.d/certbot-fakesite <<CRON
-# MySphere fakesite — certbot auto-renewal (webroot, zero-downtime)
+# RuCloud fakesite — certbot auto-renewal (webroot, zero-downtime)
 0 3 * * * root certbot renew --quiet --deploy-hook "${HOOK_SCRIPT}" > /var/log/certbot-fakesite.log 2>&1
 CRON
     chmod 644 /etc/cron.d/certbot-fakesite
@@ -300,17 +300,17 @@ fi
 #################################
 # ACCESS LOG ROTATION CRON (no logrotate)
 #################################
-mkdir -p /var/log/myfakesite
-touch /var/log/myfakesite/access.log
+mkdir -p /var/log/rucloud
+touch /var/log/rucloud/access.log
 
 LOG_ROTATE_SCRIPT="${PROJECT_DIR}/data/log-rotate-by-size.sh"
 if [[ -f "$LOG_ROTATE_SCRIPT" ]]; then
   chmod 755 "$LOG_ROTATE_SCRIPT" 2>/dev/null || true
-  cat > /etc/cron.d/myfakesite-log-rotate <<CRON
-# MySphere fakesite — access log rotation by size (1 MiB), without logrotate
+  cat > /etc/cron.d/rucloud-log-rotate <<CRON
+# RuCloud fakesite — access log rotation by size (1 MiB), without logrotate
 */5 * * * * root ${LOG_ROTATE_SCRIPT} >/dev/null 2>&1
 CRON
-  chmod 644 /etc/cron.d/myfakesite-log-rotate
+  chmod 644 /etc/cron.d/rucloud-log-rotate
   log "cron для ротации access.log подтверждён ✓"
 else
   warn "Скрипт ротации логов не найден: $LOG_ROTATE_SCRIPT"
@@ -374,5 +374,5 @@ docker image prune -f 2>/dev/null || true
 
 echo ""
 echo "==================================================="
-log "✔ MySphere fakesite обновлён до ${BRANCH}"
+log "✔ RuCloud fakesite обновлён до ${BRANCH}"
 echo "==================================================="

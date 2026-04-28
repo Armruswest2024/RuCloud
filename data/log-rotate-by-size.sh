@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # file: data/log-rotate-by-size.sh v1.0
 #
-# Size-based rotation for myfakesite access log without logrotate.
+# Size-based rotation for RuCloud access log without logrotate.
 # - Rotates when access.log reaches 1 MiB
 # - Keeps rotated files for 7 days
 # - Safe for fail2ban (truncate in place)
 
 set -euo pipefail
 
-LOG_DIR="/var/log/myfakesite"
+LOG_DIR="/var/log/rucloud"
 LOG_FILE="${LOG_DIR}/access.log"
 MAX_SIZE_BYTES=$((1024 * 1024)) # 1 MiB
 RETENTION_DAYS=7
