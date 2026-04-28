@@ -1,7 +1,7 @@
 <?php
 // file: status.php v1.0
 header('Content-Type: application/json; charset=utf-8');
-header('X-Powered-By: MySphere/VERSION_PLACEHOLDER');
+header('X-Powered-By: RuCloud/VERSION_PLACEHOLDER');
 http_response_code(200);
 
 echo json_encode([
@@ -9,6 +9,6 @@ echo json_encode([
     'maintenance' => false,
     'version' => 'VERSION_PLACEHOLDER',
     'build' => '2026.03.15',
-    'product' => 'MySphere',
+    'product' => 'RuCloud',
     'api' => '1.0',
 ]);

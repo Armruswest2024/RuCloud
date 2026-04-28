@@ -123,7 +123,7 @@ if [[ -n "$p80" ]]; then
   fi
 
   echo ""
-  echo "  MySphere требует порт 80."
+  echo "  RuCloud требует порт 80."
   echo "  1) Остановить ${p80_name} и продолжить"
   echo "  2) Продолжить так (контейнеры могут не запуститься)"
   echo ""
@@ -148,72 +148,73 @@ else
 fi
 
 # --- Порт 443 (только HTTPS) ---
-if [[ "$MODE" != "http" ]]; then
-  p443=$(check_port 443) || true
-  if [[ -n "$p443" ]]; then
-    IFS=':' read -r p443_pid p443_name <<< "$p443"
-    warn "Порт 443 занят: ${p443_name} (PID ${p443_pid})"
-
-    if [[ "$NON_INTERACTIVE" == "true" ]]; then
-      die "Порт 443 занят (${p443_name}). Освободите порт и повторите установку."
-    fi
-
-    echo ""
-    echo "  MySphere требует порт 443 для HTTPS."
-    echo "  1) Остановить ${p443_name} и продолжить"
-    echo "  2) Переключиться на HTTP-режим (без SSL)"
-    echo "  3) Продолжить так (контейнеры могут не запуститься)"
-    echo "  4) Указать свой HTTPS-порт (например 8443)"
-    echo ""
-    read -r -p "Выбор [1]: " ch
-    case "$ch" in
-      2)
-        log "Переключаемся на HTTP-режим..."
-        MODE="http"
-        DOMAIN="localhost"
-        export MODE SSL_PORT
-        ;;
-      3)
-        warn "Продолжаем с занятым портом 443."
-        ;;
-      4)
-        choose_custom_ssl_port
-        ;;
-      *)
-        log "Останавливаем ${p443_name} (PID ${p443_pid})..."
-        kill "$p443_pid" 2>/dev/null || {
-          warn "Не удалось остановить. Попробуйте: sudo kill -9 ${p443_pid}"
-          die "Установка прервана."
-        }
-        sleep 1
-        if ss -tlnp "sport = :443" 2>/dev/null | grep -qv "^State"; then
-          warn "Порт 443 всё ещё занят."
-          die "Установка прервана."
-        fi
-        log "Порт 443 свободен ✓"
-        ;;
-    esac
-  else
-    log "Порт 443 свободен ✓"
-    if [[ "$NON_INTERACTIVE" != "true" ]]; then
-      echo ""
-      echo "  MySphere может использовать порт 443 или другой порт."
-      echo "  1) Использовать порт 443 (по умолчанию)"
-      echo "  2) Указать свой HTTPS-порт (например 8443)"
-      echo ""
-      read -r -p "Выбор [1]: " ch
-      case "$ch" in
-        2)
-          choose_custom_ssl_port
-          ;;
-        *)
-          log "Используем порт 443."
-          SSL_PORT=443
-          ;;
-      esac
-    fi
-  fi
-fi
+# Закомментировано: порт 443 будет занят нодой VPN (Xray/Reality)
+# if [[ "$MODE" != "http" ]]; then
+#   p443=$(check_port 443) || true
+#   if [[ -n "$p443" ]]; then
+#     IFS=':' read -r p443_pid p443_name <<< "$p443"
+#     warn "Порт 443 занят: ${p443_name} (PID ${p443_pid})"
+#
+#     if [[ "$NON_INTERACTIVE" == "true" ]]; then
+#       die "Порт 443 занят (${p443_name}). Освободите порт и повторите установку."
+#     fi
+#
+#     echo ""
+#     echo "  RuCloud требует порт 443 для HTTPS."
+#     echo "  1) Остановить ${p443_name} и продолжить"
+#     echo "  2) Переключиться на HTTP-режим (без SSL)"
+#     echo "  3) Продолжить так (контейнеры могут не запуститься)"
+#     echo "  4) Указать свой HTTPS-порт (например 8443)"
+#     echo ""
+#     read -r -p "Выбор [1]: " ch
+#     case "$ch" in
+#       2)
+#         log "Переключаемся на HTTP-режим..."
+#         MODE="http"
+#         DOMAIN="localhost"
+#         export MODE SSL_PORT
+#         ;;
+#       3)
+#         warn "Продолжаем с занятым портом 443."
+#         ;;
+#       4)
+#         choose_custom_ssl_port
+#         ;;
+#       *)
+#         log "Останавливаем ${p443_name} (PID ${p443_pid})..."
+#         kill "$p443_pid" 2>/dev/null || {
+#           warn "Не удалось остановить. Попробуйте: sudo kill -9 ${p443_pid}"
+#           die "Установка прервана."
+#         }
+#         sleep 1
+#         if ss -tlnp "sport = :443" 2>/dev/null | grep -qv "^State"; then
+#           warn "Порт 443 всё ещё занят."
+#           die "Установка прервана."
+#         fi
+#         log "Порт 443 свободен ✓"
+#         ;;
+#     esac
+#   else
+#     log "Порт 443 свободен ✓"
+#     if [[ "$NON_INTERACTIVE" != "true" ]]; then
+#       echo ""
+#       echo "  RuCloud может использовать порт 443 или другой порт."
+#       echo "  1) Использовать порт 443 (по умолчанию)"
+#       echo "  2) Указать свой HTTPS-порт (например 8443)"
+#       echo ""
+#       read -r -p "Выбор [1]: " ch
+#       case "$ch" in
+#         2)
+#           choose_custom_ssl_port
+#           ;;
+#         *)
+#           log "Используем порт 443."
+#           SSL_PORT=443
+#           ;;
+#       esac
+#     fi
+#   fi
+# fi
 
 export MODE SSL_PORT
 
