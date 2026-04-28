@@ -217,8 +217,8 @@ HTTPCONF
   log "Адаптируем docker-compose.yml для HTTP-режима..."
 
   sed -Ei '/- "[0-9]+:443"/d' docker-compose.yml
-  sed -i '/fullchain\.pem.*fakesite\.crt/d' docker-compose.yml
-  sed -i '/privkey\.pem.*fakesite\.key/d' docker-compose.yml
+  sed -i '/fullchain\.pem.*rucloud\.crt/d' docker-compose.yml
+  sed -i '/privkey\.pem.*rucloud\.key/d' docker-compose.yml
   sed -i 's|./data/nginx\.conf:/etc/nginx/conf\.d/default\.conf:ro|./nginx-http.conf:/etc/nginx/conf.d/default.conf:ro|' docker-compose.yml
 
   log "HTTP-конфигурация готова ✓"

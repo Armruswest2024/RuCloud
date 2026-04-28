@@ -1,23 +1,23 @@
 <!-- file: architecture.md v1.1 -->
-# MySphere fakesite — Architecture & Logic Flow
+# RuCloud rucloud — Architecture & Logic Flow
 
 ## Security & Logging Addendum (v1.1)
 
 ```mermaid
 flowchart TD
-  A["Nginx: global access_log off"] --> B["location /api/auth: access_log /var/log/myfakesite/access.log"]
-  B --> C["Host bind mount: /var/log/myfakesite:/var/log/myfakesite"]
-  C --> D["Cron: /etc/cron.d/myfakesite-log-rotate (*/5)"]
-  D --> E["/opt/myfakesite/data/log-rotate-by-size.sh"]
+  A["Nginx: global access_log off"] --> B["location /api/auth: access_log /var/log/myrucloud/access.log"]
+  B --> C["Host bind mount: /var/log/myrucloud:/var/log/myrucloud"]
+  C --> D["Cron: /etc/cron.d/myrucloud-log-rotate (*/5)"]
+  D --> E["/opt/myrucloud/data/log-rotate-by-size.sh"]
   E --> F["Rotate at 1 MiB + keep 7 days"]
   B --> G["Manual fail2ban integration via README (filter + jail)"]
   A --> H["Deny direct script access: /log-rotate-by-size.sh and /data/log-rotate-by-size.sh -> 404"]
 ```
 
 Notes:
-- Login attempts are represented by `POST /api/auth` events (`401`/`429`) in `/var/log/myfakesite/access.log`.
-- `myfakesite-log-rotate` is project-owned cron; certbot cron is separate lifecycle.
-- `delete.sh` removes only project log artifacts (`myfakesite-log-rotate`, `/var/log/myfakesite`) and preserves certbot/certificates.
+- Login attempts are represented by `POST /api/auth` events (`401`/`429`) in `/var/log/myrucloud/access.log`.
+- `myrucloud-log-rotate` is project-owned cron; certbot cron is separate lifecycle.
+- `delete.sh` removes only project log artifacts (`myrucloud-log-rotate`, `/var/log/myrucloud`) and preserves certbot/certificates.
 
 ## Install Pipeline Overview
 
@@ -30,9 +30,9 @@ flowchart TD
   E --> F["Phase 5: start.sh"]
 
   subgraph INSTALL_ARGS [install.sh аргументы]
-    A1["-r репозиторий (по умолчанию: iqubik/myfakesite.git)"]
+    A1["-r репозиторий (по умолчанию: iqubik/myrucloud.git)"]
     A2["-b ветка (по умолчанию: main)"]
-    A3["-p директория (по умолчанию: /opt/myfakesite)"]
+    A3["-p директория (по умолчанию: /opt/myrucloud)"]
     A4["-d домен/IP (опц.)"]
     A5["-c cert_path (опц.)"]
     A6["-k key_path (опц.)"]
@@ -224,9 +224,9 @@ flowchart TD
   HTTPCode -->|Нет| Fail["warn: Сайт не отвечает\ndocker compose logs"]
 
   Success --> SSLModeCheck{"SSL_MODE ==\nletsencrypt?"}
-  Success --> LogRotateSetup["chmod +x data/log-rotate-by-size.sh\nсоздать /etc/cron.d/myfakesite-log-rotate\n*/5 * * * * root script"]
+  Success --> LogRotateSetup["chmod +x data/log-rotate-by-size.sh\nсоздать /etc/cron.d/myrucloud-log-rotate\n*/5 * * * * root script"]
 
-  SSLModeCheck -->|Да| CertbotSetup["mkdir /etc/myfakesite\necho PROJECT_DIR > project_path\nсоздать /etc/cron.d/certbot-fakesite\nwebroot renew 3:00 AM"]
+  SSLModeCheck -->|Да| CertbotSetup["mkdir /etc/myrucloud\necho PROJECT_DIR > project_path\nсоздать /etc/cron.d/certbot-rucloud\nwebroot renew 3:00 AM"]
   SSLModeCheck -->|Нет| Summary
   CertbotSetup --> Summary
   LogRotateSetup --> Summary
@@ -261,7 +261,7 @@ flowchart TD
 
   VersionCheck -->|Да| BumpVer["_bump_version()\nтекущая → новая версия"]
 
-  BumpVer --> LogRotateCron["/etc/cron.d/myfakesite-log-rotate\n*/5 -> data/log-rotate-by-size.sh"]
+  BumpVer --> LogRotateCron["/etc/cron.d/myrucloud-log-rotate\n*/5 -> data/log-rotate-by-size.sh"]
   VersionCheck -->|Нет| LogRotateCron
   LogRotateCron --> Restart["docker compose up -d\n--remove-orphans --force-recreate"]
 
@@ -278,12 +278,12 @@ flowchart TD
   CurlHTTPS2 --> CheckCode{"HTTP 200/301/302?"}
   CurlHTTP2 --> CheckCode
 
-  CheckCode -->|Да| CertbotCheck2{"SSL_MODE ==\nletsencrypt и нет\ncertbot-fakesite cron?"}
+  CheckCode -->|Да| CertbotCheck2{"SSL_MODE ==\nletsencrypt и нет\ncertbot-rucloud cron?"}
   CheckCode -->|Нет| WarnU["warn: Сайт не отвечает"]
 
   CertbotCheck2 -->|Да| CreateCron["Создать certbot cron"]
   CertbotCheck2 -->|Нет| DoneU
-  CreateCron --> DoneU["log: MySphere fakesite\nобновлён до branch ✓"]
+  CreateCron --> DoneU["log: RuCloud rucloud\nобновлён до branch ✓"]
 
   style DieU fill:#f88,color:#000
   style DieU2 fill:#f88,color:#000
@@ -318,17 +318,17 @@ flowchart TD
   WarnNoYML --> CleanImages
   SkipDocker --> CleanImages
 
-  CleanImages["docker images | grep\nmyfakesite|fakesite | xargs rmi -f"] --> CleanNetworks["docker network rm\norphan сети (root_fakesite)"]
+  CleanImages["docker images | grep\nmyrucloud|rucloud | xargs rmi -f"] --> CleanNetworks["docker network rm\norphan сети (root_rucloud)"]
 
-  CleanNetworks --> CleanTmp["rm -rf /tmp/myfakesite-install"]
-  CleanTmp --> CleanArtifacts["cleanup_system_artifacts:\nrm /etc/cron.d/myfakesite-log-rotate\nrm -rf /var/log/myfakesite"]
-  CleanArtifacts --> PreserveCerts["СОХРАНИТЬ:\n/etc/letsencrypt\n/etc/cron.d/certbot-fakesite\n/etc/myfakesite/*"]
+  CleanNetworks --> CleanTmp["rm -rf /tmp/myrucloud-install"]
+  CleanTmp --> CleanArtifacts["cleanup_system_artifacts:\nrm /etc/cron.d/myrucloud-log-rotate\nrm -rf /var/log/myrucloud"]
+  CleanArtifacts --> PreserveCerts["СОХРАНИТЬ:\n/etc/letsencrypt\n/etc/cron.d/certbot-rucloud\n/etc/myrucloud/*"]
 
   PreserveCerts --> RmDir["rm -rf PROJECT_DIR"]
   WarnD --> CleanArtifactsNoDir["cleanup_system_artifacts\n(даже если проекта уже нет)"]
   CleanArtifactsNoDir --> DoneD
 
-  RmDir --> DoneD["log: MySphere fakesite\nполностью удалён"]
+  RmDir --> DoneD["log: RuCloud rucloud\nполностью удалён"]
 
   style ExitDel fill:#ff8,color:#000
   style WarnD fill:#ff8,color:#000

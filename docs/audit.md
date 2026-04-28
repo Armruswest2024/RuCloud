@@ -1,8 +1,8 @@
 <!-- file: audit.md v1.0 -->
-# Аудит проекта myfakesite
+# Аудит проекта myrucloud
 
 **Дата:** 12 апреля 2026 г.  
-**Репозиторий:** https://github.com/iqubik/myfakesite  
+**Репозиторий:** https://github.com/iqubik/myrucloud  
 **Методология:** Мультиагентный аудит (4 агента: безопасность, качество кода, Docker, nginx)
 
 ---
@@ -80,11 +80,11 @@ map $request_id $auth_error_msg {
 #### [CRITICAL] SSL-пути-заглушки монтируются как volumes
 
 ```yaml
-- /etc/letsencrypt/live/YOUDOMEN.XXX/fullchain.pem:/etc/nginx/certs/fakesite.crt:ro
-- /etc/letsencrypt/live/YOUDOMEN.XXX/privkey.pem:/etc/nginx/certs/fakesite.key:ro
+- /etc/letsencrypt/live/YOUDOMEN.XXX/fullchain.pem:/etc/nginx/certs/rucloud.crt:ro
+- /etc/letsencrypt/live/YOUDOMEN.XXX/privkey.pem:/etc/nginx/certs/rucloud.key:ro
 ```
 
-Пути содержат заглушку `YOUDOMEN.XXX`. Если файлы не существуют, контейнер fakesite не запустится (Docker создаст директории вместо файлов, и nginx упадёт).
+Пути содержат заглушку `YOUDOMEN.XXX`. Если файлы не существуют, контейнер rucloud не запустится (Docker создаст директории вместо файлов, и nginx упадёт).
 
 #### [HIGH] PHP-контейнер без `no-new-privileges` и `read_only`
 
@@ -368,7 +368,7 @@ PHP-контейнер работает от root без ограничений:
 
 | Сервис | Текущий тег | Проблема |
 |--------|------------|----------|
-| `fakesite` | `nginx:alpine` | **Плавающий тег** — сегодня nginx 1.27.x, завтра изменится. Невоспроизводимая сборка |
+| `rucloud` | `nginx:alpine` | **Плавающий тег** — сегодня nginx 1.27.x, завтра изменится. Невоспроизводимая сборка |
 | `php-fpm` | `php:8.3-fpm-alpine` | **Полу-плавающий** — минорные 8.3.x меняются. Лучше фиксировать: `php:8.3.29-fpm-alpine` |
 
 **Рекомендация:** Заменить на конкретные версии с digest:
@@ -403,7 +403,7 @@ image: php:8.3.29-fpm-alpine@sha256:...
 ### 3.4 Resource Limits
 
 ```yaml
-# fakesite (nginx)
+# rucloud (nginx)
 limits:
   cpus: "0.25"
   memory: 64M
@@ -442,7 +442,7 @@ deploy:
 
 **Рекомендация:**
 ```yaml
-# fakesite (nginx)
+# rucloud (nginx)
 healthcheck:
   test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/heartbeat"]
   interval: 30s
@@ -487,7 +487,7 @@ deploy:
 
 ### 3.8 Networks
 
-Custom bridge-сеть `fakesite` — правильно. PHP-FPM недоступен напрямую с хоста.
+Custom bridge-сеть `rucloud` — правильно. PHP-FPM недоступен напрямую с хоста.
 
 | Приоритет | Проблема |
 |-----------|----------|
@@ -622,7 +622,7 @@ location ~ \.php$ {
 | Приоритет | Проблема |
 |-----------|----------|
 | **CRITICAL** | `include fastcgi_params` стоит **ПОСЛЕ** `fastcgi_param SCRIPT_FILENAME`. В стандартном `fastcgi_params` может быть определён `SCRIPT_FILENAME`, который **перезапишет** вашу строку |
-| MEDIUM | Конфликт: `fastcgi_hide_header X-Powered-By` скрывает PHP-версию, но `status.php` сам устанавливает `X-Powered-By: MySphere/2.4.8` |
+| MEDIUM | Конфликт: `fastcgi_hide_header X-Powered-By` скрывает PHP-версию, но `status.php` сам устанавливает `X-Powered-By: RuCloud/2.4.8` |
 | LOW | Нет `fastcgi_param HTTPS on;` — PHP может не знать о HTTPS |
 | LOW | Нет `fastcgi_read_timeout`, `fastcgi_connect_timeout` — дефолтные 60s |
 

@@ -4,7 +4,7 @@
 
 ---
 
-# MySphere — Урок: Mock API в Nginx. Полный разбор проекта
+# RuCloud — Урок: Mock API в Nginx. Полный разбор проекта
 
 > **Цель урока:** понять, как имитировать полноценный бэкенд с помощью одного лишь Nginx, и зачем это нужно при разработке фронтенда.
 
@@ -38,7 +38,7 @@ Mock API — это заглушки, которые **выглядят для �
 
 ```
 docker-compose.yml
-├── fakesite (nginx:alpine)
+├── rucloud (nginx:alpine)
 │   ├── :80  → HTTP (редирект на HTTPS)
 │   ├── :443 → HTTPS (SSL-терминация)
 │   ├── nginx.conf   ← здесь вся магия mock API
@@ -63,9 +63,9 @@ docker-compose.yml
 
 ```yaml
 services:
-  fakesite:
+  rucloud:
     image: nginx:alpine
-    container_name: fakesite
+    container_name: rucloud
     restart: unless-stopped
     ports:
       - "80:80"
@@ -78,10 +78,10 @@ services:
       - ./apple-touch-icon.png:/usr/share/nginx/html/apple-touch-icon.png:ro
       - ./robots.txt:/usr/share/nginx/html/robots.txt:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - /etc/letsencrypt/live/YOUDOMEN.XXX/fullchain.pem:/etc/nginx/certs/fakesite.crt:ro
-      - /etc/letsencrypt/live/YOUDOMEN.XXX/privkey.pem:/etc/nginx/certs/fakesite.key:ro
+      - /etc/letsencrypt/live/YOUDOMEN.XXX/fullchain.pem:/etc/nginx/certs/rucloud.crt:ro
+      - /etc/letsencrypt/live/YOUDOMEN.XXX/privkey.pem:/etc/nginx/certs/rucloud.key:ro
     networks:
-      - fakesite
+      - rucloud
     depends_on:
       - php-fpm
     deploy:
@@ -108,13 +108,13 @@ services:
 ```yaml
   php-fpm:
     image: php:8.3-fpm-alpine
-    container_name: fakesite-php
+    container_name: rucloud-php
     restart: unless-stopped
     volumes:
       - ./status.php:/usr/share/nginx/html/status.php:ro
       - ./phpinfo.php:/usr/share/nginx/html/phpinfo.php:ro
     networks:
-      - fakesite
+      - rucloud
     deploy:
       resources:
         limits:
@@ -130,7 +130,7 @@ PHP-FPM — это FastCGI Process Manager. Он **не слушает HTTP-по
 
 ```yaml
 networks:
-  fakesite:
+  rucloud:
     driver: bridge
 ```
 
@@ -199,8 +199,8 @@ server {
     listen [::]:443 ssl;
     server_name YOUDOMEN.XXX;
 
-    ssl_certificate /etc/nginx/certs/fakesite.crt;
-    ssl_certificate_key /etc/nginx/certs/fakesite.key;
+    ssl_certificate /etc/nginx/certs/rucloud.crt;
+    ssl_certificate_key /etc/nginx/certs/rucloud.key;
 
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
@@ -264,14 +264,14 @@ JavaScript-роутер в браузере видит URL `/dashboard` и от�
 ```nginx
     location ~ ^/api/status$ {
         default_type application/json;
-        add_header X-Powered-By "MySphere/2.4.8" always;
+        add_header X-Powered-By "RuCloud/2.4.8" always;
         add_header X-Request-Id "$request_id" always;
         add_header X-Content-Type-Options "nosniff" always;
         add_header X-Frame-Options "SAMEORIGIN" always;
         add_header X-Robots-Tag "noindex, nofollow" always;
         add_header Referrer-Policy "no-referrer" always;
         add_header Strict-Transport-Security "max-age=15552000; includeSubDomains" always;
-        return 200 '{"online":true,"maintenance":false,"version":"2.4.8","build":"2026.03.15","product":"MySphere","api":"1.0"}';
+        return 200 '{"online":true,"maintenance":false,"version":"2.4.8","build":"2026.03.15","product":"RuCloud","api":"1.0"}';
     }
 ```
 
@@ -279,7 +279,7 @@ JavaScript-роутер в браузере видит URL `/dashboard` и от�
 
 - `location ~ ^/api/status$` — регулярное выражение. `~` = case-sensitive regex match. Точное совпадение `/api/status`
 - `default_type application/json` — если не указан Content-Type, браузер поймёт что это JSON
-- `add_header` — стандартные заголовки + фейковый `X-Powered-By: MySphere/2.4.8` (имитация реального бэкенда)
+- `add_header` — стандартные заголовки + фейковый `X-Powered-By: RuCloud/2.4.8` (имитация реального бэкенда)
 - `return 200 '...'` — **вот он, mock API**. Nginx возвращает HTTP 200 с телом JSON. Ни одного бэкенд-сервера не было вызвано.
 
 **Результат запроса:**
@@ -289,7 +289,7 @@ JavaScript-роутер в браузере видит URL `/dashboard` и от�
   "maintenance": false,
   "version": "2.4.8",
   "build": "2026.03.15",
-  "product": "MySphere",
+  "product": "RuCloud",
   "api": "1.0"
 }
 ```
@@ -552,7 +552,7 @@ index.html
 │   ├── .bg-planet (планета-фон внизу экрана)
 │   ├── #canvas-container (Three.js 3D-фон)
 │   ├── #login-container (форма логина поверх 3D)
-│   │   ├── logo-wrapper (лого + "MySphere")
+│   │   ├── logo-wrapper (лого + "RuCloud")
 │   │   ├── form-wrapper
 │   │   │   └── #form-card (glassmorphism карточка)
 │   │   │       ├── CSRF token (hidden)
@@ -575,11 +575,11 @@ index.html
         .then(r => r.json())
         .then(data => {
             if (data.online && !data.maintenance) {
-                console.log('[MySphere] Server ready — v' + data.version);
+                console.log('[RuCloud] Server ready — v' + data.version);
             }
         })
         .catch(() => {
-            console.warn('[MySphere] Status check failed — offline mode');
+            console.warn('[RuCloud] Status check failed — offline mode');
         });
 })();
 ```
@@ -844,7 +844,7 @@ window.addEventListener('resize', () => {
 ```php
 <?php
 header('Content-Type: application/json; charset=utf-8');
-header('X-Powered-By: MySphere/2.4.8');
+header('X-Powered-By: RuCloud/2.4.8');
 http_response_code(200);
 
 echo json_encode([
@@ -852,7 +852,7 @@ echo json_encode([
     'maintenance' => false,
     'version' => '2.4.8',
     'build' => '2026.03.15',
-    'product' => 'MySphere',
+    'product' => 'RuCloud',
     'api' => '1.0',
 ]);
 ```
@@ -868,7 +868,7 @@ echo json_encode([
   "maintenance": false,
   "version": "2.4.8",
   "build": "2026.03.15",
-  "product": "MySphere",
+  "product": "RuCloud",
   "api": "1.0"
 }
 ```
@@ -982,7 +982,7 @@ location ^~ /api/ {
 
 ---
 
-[🔝 В начало](#mysphere--урок-mock-api-в-nginx-полный-разбор-проекта) | [🇷🇺 Русская часть](#-часть-1-зачем-нужен-mock-api)
+[🔝 В начало](#rucloud--урок-mock-api-в-nginx-полный-разбор-проекта) | [🇷🇺 Русская часть](#-часть-1-зачем-нужен-mock-api)
 
 ---
 
@@ -1020,7 +1020,7 @@ Mock API — these are stubs that **look like a real server to the frontend**. T
 
 ```
 docker-compose.yml
-├── fakesite (nginx:alpine)
+├── rucloud (nginx:alpine)
 │   ├── :80  → HTTP (redirect to HTTPS)
 │   ├── :443 → HTTPS (SSL termination)
 │   ├── nginx.conf   ← all the mock API magic
@@ -1045,9 +1045,9 @@ docker-compose.yml
 
 ```yaml
 services:
-  fakesite:
+  rucloud:
     image: nginx:alpine
-    container_name: fakesite
+    container_name: rucloud
     restart: unless-stopped
     ports:
       - "80:80"
@@ -1058,7 +1058,7 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       # ... other volumes ...
     networks:
-      - fakesite
+      - rucloud
     depends_on:
       - php-fpm
     deploy:
@@ -1141,8 +1141,8 @@ server {
     listen [::]:443 ssl;
     server_name YOUDOMEN.XXX;
 
-    ssl_certificate /etc/nginx/certs/fakesite.crt;
-    ssl_certificate_key /etc/nginx/certs/fakesite.key;
+    ssl_certificate /etc/nginx/certs/rucloud.crt;
+    ssl_certificate_key /etc/nginx/certs/rucloud.key;
 
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
@@ -1204,9 +1204,9 @@ The JavaScript router in the browser sees URL `/dashboard` and renders the corre
 ```nginx
 location ~ ^/api/status$ {
     default_type application/json;
-    add_header X-Powered-By "MySphere/2.4.8" always;
+    add_header X-Powered-By "RuCloud/2.4.8" always;
     add_header X-Request-Id "$request_id" always;
-    return 200 '{"online":true,"maintenance":false,"version":"2.4.8","build":"2026.03.15","product":"MySphere","api":"1.0"}';
+    return 200 '{"online":true,"maintenance":false,"version":"2.4.8","build":"2026.03.15","product":"RuCloud","api":"1.0"}';
 }
 ```
 
@@ -1214,7 +1214,7 @@ location ~ ^/api/status$ {
 
 - `location ~ ^/api/status$` — regex match. `~` = case-sensitive. Exact match `/api/status`
 - `default_type application/json` — browser understands this is JSON
-- `add_header` — standard headers + fake `X-Powered-By: MySphere/2.4.8` (simulating a real backend)
+- `add_header` — standard headers + fake `X-Powered-By: RuCloud/2.4.8` (simulating a real backend)
 - `return 200 '...'` — **this is the mock API**. Nginx returns HTTP 200 with a JSON body. Zero backend servers were invoked.
 
 ### 4.8. Mock API: Authentication with Rate Limiting
@@ -1381,7 +1381,7 @@ index.html
 │   ├── .bg-planet (planet background at the bottom)
 │   ├── #canvas-container (Three.js 3D background)
 │   ├── #login-container (login form overlaying 3D)
-│   │   ├── logo-wrapper (logo + "MySphere")
+│   │   ├── logo-wrapper (logo + "RuCloud")
 │   │   ├── form-wrapper
 │   │   │   └── #form-card (glassmorphism card)
 │   │   │       ├── CSRF token (hidden field)
@@ -1404,11 +1404,11 @@ index.html
         .then(r => r.json())
         .then(data => {
             if (data.online && !data.maintenance) {
-                console.log('[MySphere] Server ready — v' + data.version);
+                console.log('[RuCloud] Server ready — v' + data.version);
             }
         })
         .catch(() => {
-            console.warn('[MySphere] Status check failed — offline mode');
+            console.warn('[RuCloud] Status check failed — offline mode');
         });
 })();
 ```
@@ -1634,7 +1634,7 @@ animate();
 ```php
 <?php
 header('Content-Type: application/json; charset=utf-8');
-header('X-Powered-By: MySphere/2.4.8');
+header('X-Powered-By: RuCloud/2.4.8');
 http_response_code(200);
 
 echo json_encode([
@@ -1642,7 +1642,7 @@ echo json_encode([
     'maintenance' => false,
     'version' => '2.4.8',
     'build' => '2026.03.15',
-    'product' => 'MySphere',
+    'product' => 'RuCloud',
     'api' => '1.0',
 ]);
 ```
@@ -1758,4 +1758,4 @@ location ^~ /api/ {
 
 ---
 
-[🔝 В начало](#mysphere--урок-mock-api-в-nginx-полный-разбор-проекта) | [🇷🇺 Русская часть](#-часть-1-зачем-нужен-mock-api)
+[🔝 В начало](#rucloud--урок-mock-api-в-nginx-полный-разбор-проекта) | [🇷🇺 Русская часть](#-часть-1-зачем-нужен-mock-api)

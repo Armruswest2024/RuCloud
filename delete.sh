@@ -80,7 +80,7 @@ while getopts ":p:fh" opt; do
 done
 
 if [[ $FORCE -eq 0 ]]; then
-  read -r -p "Вы уверены, что хотите удалить RuCloud fakesite из $PROJECT_DIR? (y/n): " answer
+  read -r -p "Вы уверены, что хотите удалить RuCloud из $PROJECT_DIR? (y/n): " answer
   case "$answer" in
     y|Y)
       log "Начинаю удаление..."
@@ -108,16 +108,16 @@ else
   warn "Compose команда недоступна"
 fi
 
-log "Начинаем удаление RuCloud fakesite"
+log "Начинаем удаление RuCloud"
 
 if [[ ! -d "$PROJECT_DIR" ]]; then
   warn "Директория $PROJECT_DIR не найдена — удалять нечего"
 
   # VERIFY: убеждаемся что и контейнеров/образов проекта нет
-  remaining_containers=$(docker ps -a --filter 'name=fakesite' --format '{{.Names}}' 2>/dev/null || true)
-  remaining_images=$(docker images --filter "reference=fakesite*" --format '{{.Repository}}' 2>/dev/null || true)
-  remaining_volumes=$(docker volume ls --filter 'name=fakesite' --filter 'name=rucloud' -q 2>/dev/null || true)
-  remaining_networks=$(docker network ls --filter 'name=fakesite' --filter 'name=rucloud' --format '{{.Name}}' 2>/dev/null || true)
+  remaining_containers=$(docker ps -a --filter 'name=rucloud' --format '{{.Names}}' 2>/dev/null || true)
+  remaining_images=$(docker images --filter "reference=rucloud*" --format '{{.Repository}}' 2>/dev/null || true)
+  remaining_volumes=$(docker volume ls --filter 'name=rucloud' --filter 'name=rucloud' -q 2>/dev/null || true)
+  remaining_networks=$(docker network ls --filter 'name=rucloud' --filter 'name=rucloud' --format '{{.Name}}' 2>/dev/null || true)
 
   if [[ -z "$remaining_containers" && -z "$remaining_images" && -z "$remaining_volumes" && -z "$remaining_networks" ]]; then
     log "Контейнеры проекта отсутствуют ✓"
@@ -147,7 +147,7 @@ if [[ ! -d "$PROJECT_DIR" ]]; then
   rm -rf /tmp/rucloud-install 2>/dev/null || true
   cleanup_system_artifacts
 
-  log "✔ RuCloud fakesite уже удалён"
+  log "✔ RuCloud уже удалён"
   exit 0
 fi
 
@@ -158,11 +158,11 @@ cd "$PROJECT_DIR"
 #################################
 if [[ "${COMPOSE_AVAILABLE:-0}" -eq 1 ]]; then
   if [[ -f docker-compose.yml ]]; then
-    log "Останавливаем контейнеры RuCloud fakesite"
+    log "Останавливаем контейнеры RuCloud"
     "${COMPOSE_CMD[@]}" down --volumes --remove-orphans || warn "Ошибка при docker compose down"
 
     # VERIFY: контейнеры остановлены
-    remaining=$(docker ps -a --filter 'name=fakesite' --format '{{.Names}}' 2>/dev/null || true)
+    remaining=$(docker ps -a --filter 'name=rucloud' --format '{{.Names}}' 2>/dev/null || true)
     if [[ -n "$remaining" ]]; then
       warn "Остались контейнеры: $remaining"
     else
@@ -181,14 +181,14 @@ fi
 log "Удаляем образы проекта (если есть)"
 
 # Безопасная очистка через --filter вместо grep | xargs
-docker images --filter "reference=rucloud*" --filter "reference=fakesite*" --format '{{.ID}}' \
+docker images --filter "reference=rucloud*" --filter "reference=rucloud*" --format '{{.ID}}' \
   | xargs -r docker rmi -f 2>/dev/null || true
 
 # Чистим dangling (битые) образы
 docker image prune -f 2>/dev/null || true
 
 # VERIFY: образы удалены
-remaining_imgs=$(docker images --filter "reference=fakesite*" --format '{{.Repository}}:{{.Tag}}' 2>/dev/null || true)
+remaining_imgs=$(docker images --filter "reference=rucloud*" --format '{{.Repository}}:{{.Tag}}' 2>/dev/null || true)
 if [[ -n "$remaining_imgs" ]]; then
   warn "Остались образы: $remaining_imgs"
 else
@@ -201,13 +201,13 @@ fi
 log "Очищаем тома и сети проекта..."
 
 # Удаляем volumes проекта
-remaining_volumes=$(docker volume ls --filter 'name=fakesite' --filter 'name=rucloud' -q 2>/dev/null || true)
+remaining_volumes=$(docker volume ls --filter 'name=rucloud' --filter 'name=rucloud' -q 2>/dev/null || true)
 if [[ -n "$remaining_volumes" ]]; then
   echo "$remaining_volumes" | xargs -r docker volume rm -f 2>/dev/null || warn "Не удалось удалить часть томов"
 fi
 
 # Удаляем сети проекта (docker compose down обычно делает это, но на случай если остались)
-remaining_networks=$(docker network ls --filter 'name=fakesite' --filter 'name=rucloud' --format '{{.Name}}' 2>/dev/null || true)
+remaining_networks=$(docker network ls --filter 'name=rucloud' --filter 'name=rucloud' --format '{{.Name}}' 2>/dev/null || true)
 if [[ -n "$remaining_networks" ]]; then
   echo "$remaining_networks" | while read -r net; do
     docker network rm "$net" 2>/dev/null || warn "Не удалось удалить сеть: $net"
@@ -215,14 +215,14 @@ if [[ -n "$remaining_networks" ]]; then
 fi
 
 # VERIFY: тома и сети очищены
-final_volumes=$(docker volume ls --filter 'name=fakesite' --filter 'name=rucloud' -q 2>/dev/null || true)
+final_volumes=$(docker volume ls --filter 'name=rucloud' --filter 'name=rucloud' -q 2>/dev/null || true)
 if [[ -z "$final_volumes" ]]; then
   log "Тома проекта удалены ✓"
 else
   warn "Остались тома: $final_volumes"
 fi
 
-final_networks=$(docker network ls --filter 'name=fakesite' --filter 'name=rucloud' --format '{{.Name}}' 2>/dev/null || true)
+final_networks=$(docker network ls --filter 'name=rucloud' --filter 'name=rucloud' --format '{{.Name}}' 2>/dev/null || true)
 if [[ -z "$final_networks" ]]; then
   log "Сети проекта удалены ✓"
 else
@@ -263,4 +263,4 @@ fi
 #################################
 # DONE
 #################################
-log "✔ RuCloud fakesite полностью удалён"
+log "✔ RuCloud полностью удалён"

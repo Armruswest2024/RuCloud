@@ -283,16 +283,16 @@ fi
 
 if [[ "$MODE" == "https" && -f "$LE_CERT" && "$HAS_CERTBOT" -eq 1 ]]; then
   log "Проверяем авто-обновление сертификатов..."
-  if [[ ! -f /etc/cron.d/certbot-fakesite ]]; then
+  if [[ ! -f /etc/cron.d/certbot-rucloud ]]; then
     log "Настраиваем авто-обновление сертификатов..."
     mkdir -p /etc/rucloud
     echo "$PROJECT_DIR" > /etc/rucloud/project_path
     HOOK_SCRIPT="${PROJECT_DIR}/install/certbot-renew-hook.sh"
-    cat > /etc/cron.d/certbot-fakesite <<CRON
-# RuCloud fakesite — certbot auto-renewal (webroot, zero-downtime)
-0 3 * * * root certbot renew --quiet --deploy-hook "${HOOK_SCRIPT}" > /var/log/certbot-fakesite.log 2>&1
+    cat > /etc/cron.d/certbot-rucloud <<CRON
+# RuCloud — certbot auto-renewal (webroot, zero-downtime)
+0 3 * * * root certbot renew --quiet --deploy-hook "${HOOK_SCRIPT}" > /var/log/certbot-rucloud.log 2>&1
 CRON
-    chmod 644 /etc/cron.d/certbot-fakesite
+    chmod 644 /etc/cron.d/certbot-rucloud
     log "cron job создан ✓"
   fi
 fi
@@ -307,7 +307,7 @@ LOG_ROTATE_SCRIPT="${PROJECT_DIR}/data/log-rotate-by-size.sh"
 if [[ -f "$LOG_ROTATE_SCRIPT" ]]; then
   chmod 755 "$LOG_ROTATE_SCRIPT" 2>/dev/null || true
   cat > /etc/cron.d/rucloud-log-rotate <<CRON
-# RuCloud fakesite — access log rotation by size (1 MiB), without logrotate
+# RuCloud — access log rotation by size (1 MiB), without logrotate
 */5 * * * * root ${LOG_ROTATE_SCRIPT} >/dev/null 2>&1
 CRON
   chmod 644 /etc/cron.d/rucloud-log-rotate
@@ -374,5 +374,5 @@ docker image prune -f 2>/dev/null || true
 
 echo ""
 echo "==================================================="
-log "✔ RuCloud fakesite обновлён до ${BRANCH}"
+log "✔ RuCloud обновлён до ${BRANCH}"
 echo "==================================================="

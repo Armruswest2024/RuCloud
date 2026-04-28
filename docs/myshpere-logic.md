@@ -1,5 +1,5 @@
 <!-- file: myshpere-logic.md v1.0 -->
-# MySphere — Application Logic
+# RuCloud — Application Logic
 
 ## Request Routing Architecture
 
@@ -13,7 +13,7 @@ flowchart TD
   Router --> PathMatch{"URI path\nmatching"}
 
   PathMatch -->|"/"| SPA["SPA location /\nroot /usr/share/nginx/html\ntry_files → /index.html"]
-  PathMatch -->|"/api/status"| Health["GET /api/status\nreturn 200 JSON\nX-Powered-By: MySphere/2.4.8"]
+  PathMatch -->|"/api/status"| Health["GET /api/status\nreturn 200 JSON\nX-Powered-By: RuCloud/2.4.8"]
   PathMatch -->|"/api/auth"| Auth["POST /api/auth\nlimit_req: 3r/min, burst=2\nreturn 401 JSON"]
   PathMatch -->|"/api/files"| Files["GET /api/files/*\nreturn 401\nТребуется авторизация"]
   PathMatch -->|"/api/users"| Users["GET /api/users/*\nreturn 401\nТребуется авторизация"]
@@ -48,7 +48,7 @@ flowchart TD
 ```mermaid
 flowchart LR
   subgraph 200_OK [200 OK — успешные]
-    S1["/api/status\n{online:true,\n maintenance:false,\n version:2.4.8,\n product:MySphere}"]
+    S1["/api/status\n{online:true,\n maintenance:false,\n version:2.4.8,\n product:RuCloud}"]
     S2["/api/settings\n{status:ok,\n lang:ru, theme:auto,\n storage:{used:2.8GB,\n total:10GB}}"]
     S3["/heartbeat\n{ok:true,\n ts:$msec}"]
   end
@@ -190,19 +190,19 @@ flowchart TD
 
 ```mermaid
 flowchart TB
-  subgraph NGINX_CONTAINER ["fakesite (nginx:alpine)"]
+  subgraph NGINX_CONTAINER ["rucloud (nginx:alpine)"]
     N1["nginx :80, :443"]
     N2["ports: 80:80, 443:443"]
     N3["limits: CPU 0.25, RAM 64M"]
   end
 
-  subgraph PHP_CONTAINER ["fakesite-php (php:8.3-fpm-alpine)"]
+  subgraph PHP_CONTAINER ["rucloud-php (php:8.3-fpm-alpine)"]
     P1["php-fpm :9000"]
     P2["no exposed ports\ninternal network only"]
     P3["limits: CPU 0.1, RAM 32M"]
   end
 
-  subgraph NETWORK ["Docker Network: fakesite (bridge)"]
+  subgraph NETWORK ["Docker Network: rucloud (bridge)"]
     NET["internal communication\nnginx -- fastcgi_pass --> php-fpm:9000"]
   end
 
@@ -212,8 +212,8 @@ flowchart TB
     V3["status.php → nginx + php-fpm"]
     V4["phpinfo.php → nginx + php-fpm"]
     V5["favicon.ico, apple-touch-icon.png, robots.txt"]
-    V6["SSL cert → /etc/nginx/certs/fakesite.crt"]
-    V7["SSL key → /etc/nginx/certs/fakesite.key"]
+    V6["SSL cert → /etc/nginx/certs/rucloud.crt"]
+    V7["SSL key → /etc/nginx/certs/rucloud.key"]
   end
 
   subgraph CERTS ["SSL Certificates"]
@@ -408,7 +408,7 @@ flowchart TD
   end
 
   F1 -->|"fetch"| M1
-  M1 -->|"200 JSON"| F2["console.log:\n'MySphere Server ready — v2.4.8'"]
+  M1 -->|"200 JSON"| F2["console.log:\n'RuCloud Server ready — v2.4.8'"]
   F1 -->|"error"| F3["console.warn:\n'Status check failed — offline mode'"]
 
   P1 -. для отладки .-> Ops["Оператор:\nпроверяет PHP-FPM\nи nginx routing"]
@@ -473,8 +473,8 @@ flowchart TD
 ```mermaid
 sequenceDiagram
   participant U as User Browser
-  participant N as nginx (fakesite)
-  participant P as php-fpm (fakesite-php)
+  participant N as nginx (rucloud)
+  participant P as php-fpm (rucloud-php)
   participant FS as File System (bind mounts)
   participant SSL as SSL Certificates
   participant Monitor as Monitoring
@@ -535,14 +535,14 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-  subgraph NGINX [fakesite — nginx:alpine]
+  subgraph NGINX [rucloud — nginx:alpine]
     N_CPU["CPU limit: 0.25 cores"]
     N_RAM["Memory limit: 64M"]
     N_PORTS["Ports: 80, 443 (exposed)"]
     N_RESTART["restart: unless-stopped"]
   end
 
-  subgraph PHP [fakesite-php — php:8.3-fpm-alpine]
+  subgraph PHP [rucloud-php — php:8.3-fpm-alpine]
     P_CPU["CPU limit: 0.1 cores"]
     P_RAM["Memory limit: 32M"]
     P_PORTS["No exposed ports\n(internal network only)"]
@@ -550,7 +550,7 @@ flowchart TD
   end
 
   subgraph NETWORK [Docker Network]
-    NET["fakesite (bridge driver)\ninternal communication\nnginx → php-fpm:9000"]
+    NET["rucloud (bridge driver)\ninternal communication\nnginx → php-fpm:9000"]
   end
 
   NGINX --> NET
@@ -585,8 +585,8 @@ flowchart LR
     N5["/usr/share/nginx/html/favicon.ico"]
     N6["/usr/share/nginx/html/apple-touch-icon.png"]
     N7["/usr/share/nginx/html/robots.txt"]
-    N8["/etc/nginx/certs/fakesite.crt"]
-    N9["/etc/nginx/certs/fakesite.key"]
+    N8["/etc/nginx/certs/rucloud.crt"]
+    N9["/etc/nginx/certs/rucloud.key"]
   end
 
   subgraph PHP_FS [php-fpm container FS]

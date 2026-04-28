@@ -9,9 +9,9 @@
 services:
   # ─── Nginx web server ───
   # Веб-сервер Nginx (раздаёт статику, проксирует PHP, имитирует API)
-  fakesite:
+  rucloud:
     image: nginx:alpine
-    container_name: fakesite
+    container_name: rucloud
     restart: unless-stopped
     ports:
       # HTTP and HTTPS ports mapped to host
@@ -37,10 +37,10 @@ services:
       - /var/www/acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge
       # SSL certificates (paths updated by install.sh for the target domain)
       # SSL-сертификаты (пути обновляются install.sh для целевого домена)
-      - /etc/letsencrypt/live/YOUDOMEN.XXX/fullchain.pem:/etc/nginx/certs/fakesite.crt:ro
-      - /etc/letsencrypt/live/YOUDOMEN.XXX/privkey.pem:/etc/nginx/certs/fakesite.key:ro
+      - /etc/letsencrypt/live/YOUDOMEN.XXX/fullchain.pem:/etc/nginx/certs/rucloud.crt:ro
+      - /etc/letsencrypt/live/YOUDOMEN.XXX/privkey.pem:/etc/nginx/certs/rucloud.key:ro
     networks:
-      - fakesite
+      - rucloud
     depends_on:
       # Wait for php-fpm to be ready before starting
       # Запуск после php-fpm (зависимость)
@@ -57,7 +57,7 @@ services:
   # Обработчик PHP (выполняет PHP-скрипты через FastCGI)
   php-fpm:
     image: php:8.3-fpm-alpine
-    container_name: fakesite-php
+    container_name: rucloud-php
     restart: unless-stopped
     volumes:
       # PHP scripts (read-only) — same files as nginx sees
@@ -65,7 +65,7 @@ services:
       - ./data/status.php:/usr/share/nginx/html/status.php:ro
       - ./data/phpinfo.php:/usr/share/nginx/html/phpinfo.php:ro
     networks:
-      - fakesite
+      - rucloud
     deploy:
       resources:
         limits:
@@ -79,5 +79,5 @@ services:
 networks:
   # Custom bridge network for inter-container communication
   # Кастомная bridge-сеть для связи между контейнерами
-  fakesite:
+  rucloud:
     driver: bridge
