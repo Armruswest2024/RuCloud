@@ -7,12 +7,12 @@
     <meta name="theme-color" content="#0d9488">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="MySphere">
+    <meta name="apple-mobile-web-app-title" content="RuCloud">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="description" content="MySphere — your personal workspace in the cloud">
+    <meta name="description" content="RuCloud — Надежная облачная инфраструктура для вашего бизнеса">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g'><stop offset='0%25' stop-color='%2338bdf8'/><stop offset='100%25' stop-color='%230284c7'/></radialGradient></defs><circle cx='50' cy='50' r='40' fill='url(%23g)'/><circle cx='38' cy='38' r='8' fill='rgba(255,255,255,0.35)'/></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g'><stop offset='0%25' stop-color='%2338bdf8'/><stop offset='100%25' stop-color='%230284c7'/></radialGradient></defs><circle cx='50' cy='50' r='40' fill='url(%23g)'/><circle cx='38' cy='38' r='8' fill='rgba(255,255,255,0.35)'/></svg>">
-    <title>MySphere</title>
+    <title>RuCloud — Надежная облачная инфраструктура</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -385,7 +385,7 @@
                     <circle cx="20" cy="20" r="18" fill="url(#sphereGrad)"/>
                     <circle cx="15" cy="14" r="5" fill="rgba(255,255,255,0.3)" class="logo-glare" style="transition: transform 0.1s linear;"/>
                 </svg>
-                <h1 class="logo-title" style="font-family: 'Inter', sans-serif; text-shadow: 0 1px 3px rgba(0, 0, 0, 1);">MySphere</h1>
+                <h1 class="logo-title" style="font-family: 'Inter', sans-serif; text-shadow: 0 1px 3px rgba(0, 0, 0, 1);">RuCloud</h1>
             </div>
         </div>
 
@@ -449,7 +449,7 @@
         <!-- Footer text -->
         <div class="footer-bar animate-fade-in">
             <p class="footer-text">
-                <a href="#" class="footer-brand">MySphere</a> — ваше личное пространство в облаке
+                <a href="#" class="footer-brand">RuCloud</a> — Надежная облачная инфраструктура для вашего бизнеса
             </p>
             <p class="footer-version">vVERSION_PLACEHOLDER</p>
         </div>
@@ -575,7 +575,7 @@
         };
 
         // --- Guest Session Storage (localStorage, no PII) ---
-        var GUEST_SESSION_KEY = 'ms_guest_session';
+        var GUEST_SESSION_KEY = 'rc_guest_session';
 
         var getGuestSession = function() {
             try {
@@ -608,11 +608,11 @@
                 .then(r => r.json())
                 .then(data => {
                     if (data.online && !data.maintenance) {
-                        console.log('[MySphere] Server ready — v' + data.version);
+                        console.log('[RuCloud] Server ready — v' + data.version);
                     }
                 })
                 .catch(() => {
-                    console.warn('[MySphere] Status check failed — offline mode');
+                    console.warn('[RuCloud] Status check failed — offline mode');
                 });
         })();
 

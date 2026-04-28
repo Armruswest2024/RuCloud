@@ -1,8 +1,67 @@
-# Personal notes / temp files
-pub.md
+# Logs and temp files
+*.log
+*.tmp
+*.swp
 
-# Local dev (self-signed certs, overrides)
-local-ssl/
-docker-compose.local.yml
-data/nginx.local.conf
-QWEN.md
+# Environment
+.env
+.env.local
+.env.
+
+# Dependencies
+node_modules/
+__pycache__/
+*.egg-info/
+dist/
+build/
+target/
+.venv/
+venv/
+
+# Editors
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.pyc
+*.class
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst

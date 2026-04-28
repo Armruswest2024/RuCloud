@@ -18,7 +18,7 @@ show_banner() {
   echo "  | |  | | (_| | (__|   <| |_| |___) |  __/ "
   echo "  |_|  |_|\__,_|\___|_|\_\\__,_|____/|_|    "
   echo ""
-  echo "          MySphere — Mock API Portal             "
+  echo "          RuCloud — Mock API Portal             "
   echo "==================================================="
   echo ""
 }
@@ -49,9 +49,9 @@ usage() {
   install.sh [-r <repo>] [-b <branch>] [-p <dir>] [-d <domain|ip>] [-c <cert_path>] [-k <key_path>] [-y]
 
 Параметры:
-  -r  Git URL репозитория (по умолчанию: https://github.com/iqubik/myfakesite.git)
+  -r  Git URL репозитория (по умолчанию: https://github.com/Armruswest2024/RuCloud)
   -b  Ветка (по умолчанию: main)
-  -p  Папка установки (по умолчанию: /opt/myfakesite)
+  -p  Папка установки (по умолчанию: /opt/rucloud)
   -d  Домен или IP-адрес для nginx
       пусто/localhost  → HTTP, порт 80
       IP-адрес         → HTTPS, self-signed сертификат
@@ -73,9 +73,9 @@ EOF
 }
 
 # ─── Defaults ──────────────────────────────────────────────
-REPO_URL="https://github.com/iqubik/myfakesite.git"
+REPO_URL="https://github.com/Armruswest2024/RuCloud"
 BRANCH="main"
-PROJECT_DIR="/opt/myfakesite"
+PROJECT_DIR="/opt/rucloud"
 DOMAIN=""
 CUSTOM_CERT=""
 CUSTOM_KEY=""
@@ -276,7 +276,7 @@ _resolve_phase_dir() {
 
   # Strategy 3: download phase files from GitHub into /tmp/install
   if [[ -z "$dir" || ! -d "$dir" ]]; then
-    local tmp_install="/tmp/myfakesite-install"
+    local tmp_install="/tmp/rucloud-install"
     
     # ВСЕГДА удаляем старый кэш и качаем свежие файлы
     rm -rf "$tmp_install"
@@ -330,3 +330,15 @@ source "$PHASE_DIR/phase4-apply.sh"
 # Phase 5: Start containers, verify, summary
 # shellcheck source=/dev/null
 source "$PHASE_DIR/phase5-start.sh"
+
+# ─── Post-install: Force replace any remaining MySphere references ───
+log "Выполняем финальную проверку и замену MySphere → RuCloud..."
+find "$PROJECT_DIR/data" -type f \( -name "*.html" -o -name "*.php" -o -name "*.conf" -o -name "*.json" \) -exec sed -i 's/MySphere/RuCloud/g' {} \; 2>/dev/null || true
+log "Финальная замена завершена ✓"
+
+# ─── Self-delete install script ──────────────────────────────
+log "Очищаем скрипт установки..."
+rm -f "$0" 2>/dev/null || true
+log "Скрипт установки удалён ✓"
+
+log "✔ Установка RuCloud завершена успешно!"
