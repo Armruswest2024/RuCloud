@@ -1,0 +1,6 @@
+# file: robots.txt v1.1
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /internal/
